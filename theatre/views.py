@@ -55,8 +55,26 @@ class PlayViewSet(
     queryset = Play.objects.all()
     serializer_class = PlaySerializer
 
+    @staticmethod
+    def _params_in_int(qs):
+        return [int(obj_id) for obj_id in qs.split(",")]
+
     def get_queryset(self):
         queryset = self.queryset
+        title = self.request.query_params.get("title")
+        genres = self.request.query_params.get("genres")
+        actors = self.request.query_params.get("actors")
+
+        if title:
+            queryset = queryset.filter(title__icontains=title)
+
+        if genres:
+            genres_id = self._params_in_int(genres)
+            queryset = queryset.filter(genres__id__in=genres_id)
+
+        if actors:
+            actors_id = self._params_in_int(actors)
+            queryset = queryset.filter(actors__id__in=actors_id)
 
         if self.action == "list":
             queryset = queryset.prefetch_related("genres", "actors")
