@@ -1,16 +1,20 @@
 from django.shortcuts import render
-from rest_framework import mixins
-from rest_framework.viewsets import GenericViewSet
+from rest_framework import mixins, viewsets
+from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
 from theatre.models import (
     Actor,
     Genre,
-    TheatreHall
+    TheatreHall,
+    Play
 )
 from theatre.serializers import (
     ActorSerializer,
     GenreSerializer,
-    TheatreHallSerializer
+    TheatreHallSerializer,
+    PlaySerializer,
+    PlayListSerializer,
+    PlayDetailSerializer
 )
 
 
@@ -43,3 +47,27 @@ class TheatreHallViewSet(
 ):
     queryset = TheatreHall.objects.all()
     serializer_class = TheatreHallSerializer
+
+
+class PlayViewSet(
+    viewsets.ModelViewSet
+):
+    queryset = Play.objects.all()
+    serializer_class = PlaySerializer
+
+    def get_queryset(self):
+        queryset = self.queryset
+
+        if self.action == "list":
+            queryset = queryset.prefetch_related("genres", "actors")
+
+        return queryset
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return PlayListSerializer
+
+        if self.action == "retrieve":
+            return PlayDetailSerializer
+
+        return PlaySerializer
