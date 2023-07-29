@@ -43,7 +43,7 @@ class Actor(models.Model):
 
 class Play(models.Model):
     title = models.CharField(max_length=255)
-    description = models.TextField
+    description = models.TextField(default="Beautiful performance")
     genres = models.ManyToManyField(Genre, related_name="plays")
     actors = models.ManyToManyField(Actor, related_name="plays")
 
