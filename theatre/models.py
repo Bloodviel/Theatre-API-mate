@@ -20,7 +20,7 @@ class TheatreHall(models.Model):
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=63)
+    name = models.CharField(max_length=63, unique=True)
 
     class Meta:
         ordering = ["name"]
