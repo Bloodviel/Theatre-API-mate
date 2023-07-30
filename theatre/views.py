@@ -12,6 +12,7 @@ from theatre.models import (
     TheatreHall,
     Play,
     Performance,
+    Reservation,
 )
 from theatre.serializers import (
     ActorSerializer,
@@ -25,6 +26,7 @@ from theatre.serializers import (
     PlaySerializer,
     PlayListSerializer,
     PlayDetailSerializer,
+    ReservationSerializer,
 )
 
 
@@ -150,3 +152,14 @@ class PerformanceViewSet(
 class TicketViewsSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+
+
+class ReservationViewSet(viewsets.ModelViewSet):
+    queryset = Reservation.objects.all()
+    serializer_class = ReservationSerializer
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
