@@ -138,7 +138,11 @@ class PerformanceListSerializer(PerformanceSerializer):
 class PerformanceDetailSerializer(PerformanceSerializer):
     play = PlayListSerializer(many=False, read_only=True)
     theatre_hall = TheatreHallSerializer(many=False, read_only=True)
-    taken_places = TicketSeatSerializer(many=True, read_only=True, source="tickets")
+    taken_places = TicketSeatSerializer(
+        many=True,
+        read_only=True,
+        source="tickets"
+    )
 
     class Meta:
         model = Performance
