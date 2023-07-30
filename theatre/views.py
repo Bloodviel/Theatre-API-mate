@@ -31,10 +31,6 @@ from theatre.serializers import (
 )
 
 
-def index(request):
-    return render(request, "theatre/index.html")
-
-
 class ActorViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
