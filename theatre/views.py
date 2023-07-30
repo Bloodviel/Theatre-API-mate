@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from django.db.models import F, Count
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -123,6 +125,34 @@ class PlayViewSet(
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="title",
+                type=str,
+                description="Filter by title (ex. ?title=YourPlay)"
+            ),
+            OpenApiParameter(
+                name="genres",
+                type={
+                    "type": "list",
+                    "items": {"type": "number"}
+                },
+                description="Filter by genres (ex. ?genres=1,2)"
+            ),
+            OpenApiParameter(
+                name="actors",
+                type={
+                    "type": "list",
+                    "items": {"type": "number"}
+                },
+                description="Filter by actors (ex. ?actors=1,2)"
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class PerformanceViewSet(
     viewsets.ModelViewSet
@@ -165,6 +195,23 @@ class PerformanceViewSet(
             return PerformanceDetailSerializer
 
         return PerformanceSerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="play",
+                type=int,
+                description="Filter by play id (ex. ?play=1)"
+            ),
+            OpenApiParameter(
+                name="date",
+                type=OpenApiTypes.DATE,
+                description="Filter by date (ex. ?date=2023-07-30)"
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class TicketViewsSet(viewsets.ModelViewSet):
