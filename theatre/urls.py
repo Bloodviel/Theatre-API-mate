@@ -5,6 +5,7 @@ from theatre.views import (
     index,
     ActorViewSet,
     GenreViewSet,
+    TicketViewsSet,
     TheatreHallViewSet,
     PerformanceViewSet,
     PlayViewSet,
@@ -16,6 +17,7 @@ router.register("genres", GenreViewSet)
 router.register("theatre_halls", TheatreHallViewSet)
 router.register("plays", PlayViewSet)
 router.register("performances", PerformanceViewSet)
+router.register("tickets", TicketViewsSet)
 
 urlpatterns = [
     path("", index, name="index"),
