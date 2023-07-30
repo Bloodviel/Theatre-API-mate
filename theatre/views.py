@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from django.db.models import F, Count
 from django.shortcuts import render
 from rest_framework import mixins, viewsets
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
@@ -6,15 +9,20 @@ from theatre.models import (
     Actor,
     Genre,
     TheatreHall,
-    Play
+    Play,
+    Performance
 )
 from theatre.serializers import (
     ActorSerializer,
     GenreSerializer,
+    GenreDetailSerializer,
     TheatreHallSerializer,
+    PerformanceSerializer,
+    PerformanceListSerializer,
+    PerformanceDetailSerializer,
     PlaySerializer,
     PlayListSerializer,
-    PlayDetailSerializer, GenreDetailSerializer
+    PlayDetailSerializer,
 )
 
 
@@ -93,3 +101,45 @@ class PlayViewSet(
             return PlayDetailSerializer
 
         return PlaySerializer
+
+
+class PerformanceViewSet(
+    viewsets.ModelViewSet
+):
+    queryset = Performance.objects.all()
+    serializer_class = PerformanceSerializer
+
+    def get_queryset(self):
+        queryset = self.queryset
+
+        play = self.request.query_params.get("play")
+        date = self.request.query_params.get("date")
+
+        if play:
+            queryset = queryset.filter(play__id=play)
+
+        if date:
+            date = datetime.strptime(date, "%Y-%m-%d").date()
+            queryset = queryset.filter(show_time__date=date)
+
+        if self.action == "list":
+            queryset = (
+                Performance.objects.select_related("play", "theatre_hall")
+                .annotate(
+                    tickets_available=F("theatre_hall__rows")
+                    * F("theatre_hall__seats_in_row")
+                    - Count("tickets")
+
+                )
+            )
+
+        return queryset
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return PerformanceListSerializer
+
+        if self.action == "retrieve":
+            return PerformanceDetailSerializer
+
+        return PerformanceSerializer
