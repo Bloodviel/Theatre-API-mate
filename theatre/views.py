@@ -71,7 +71,10 @@ class TheatreHallViewSet(
 
 
 class PlayViewSet(
-    viewsets.ModelViewSet
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    GenericViewSet
 ):
     queryset = Play.objects.all()
     serializer_class = PlaySerializer
