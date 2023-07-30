@@ -1,9 +1,9 @@
 from datetime import datetime
 
 from django.db.models import F, Count
-from django.shortcuts import render
 from rest_framework import mixins, viewsets
-from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import GenericViewSet
 
 from theatre.models import (
     Actor,
@@ -14,6 +14,7 @@ from theatre.models import (
     Performance,
     Reservation,
 )
+from theatre.permissions import IsAdminOrIsAuthenticatedReadOnly
 from theatre.serializers import (
     ActorSerializer,
     GenreSerializer,
@@ -38,6 +39,7 @@ class ActorViewSet(
 ):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
+    permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
 
 class GenreViewSet(
@@ -45,6 +47,7 @@ class GenreViewSet(
 ):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
         if self.action == "retrieve":
@@ -60,6 +63,7 @@ class TheatreHallViewSet(
 ):
     queryset = TheatreHall.objects.all()
     serializer_class = TheatreHallSerializer
+    permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
 
 class PlayViewSet(
@@ -67,6 +71,7 @@ class PlayViewSet(
 ):
     queryset = Play.objects.all()
     serializer_class = PlaySerializer
+    permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
     @staticmethod
     def _params_in_int(qs):
@@ -109,6 +114,7 @@ class PerformanceViewSet(
 ):
     queryset = Performance.objects.all()
     serializer_class = PerformanceSerializer
+    permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
     def get_queryset(self):
         queryset = self.queryset
@@ -149,11 +155,13 @@ class PerformanceViewSet(
 class TicketViewsSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+    permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
 
 class ReservationViewSet(viewsets.ModelViewSet):
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         queryset = self.queryset.filter(user=self.request.user)
